@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Automated Voter Verification MVP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #eef1f5;
+      text-align: center;
+      padding: 40px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      max-width: 550px;
+      margin: 20px auto;
+      transition: transform 0.3s ease-in-out;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+    }
+    .hidden {
+      display: none;
+    }
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(to right, #0066ff, #0047b3);
+      color: white;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: linear-gradient(to right, #0047b3, #002f80);
+    }
+    .finger-buttons button {
+      margin: 10px;
+      background: #28a745;
+    }
+    .finger-buttons button:hover {
+      background: #1e7e34;
+    }
+    h1 {
+      font-size: 2.4em;
+      margin-bottom: 30px;
+      color: #1a1a1a;
+    }
+    p, #biometricResult {
+      font-size: 1.2em;
+      color: #333;
+    }
+    h2 {
+      color: #28a745;
+    }
+    .icon {
+      font-size: 24px;
+      margin-right: 10px;
+      color: #0047b3;
+    }
+    .step-indicator {
+      margin: 20px auto;
+      font-size: 14px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1><i class="fas fa-vote-yea icon"></i>Voter Verification System</h1>
+  <div class="step-indicator" id="stepIndicator">Step 1 of 6</div>
+
+  <div class="card" id="step1">
+    <p><i class="fas fa-id-card icon"></i>Touch the Voter ID to scan</p>
+    <button onclick="scanVoterID()"><i class="fas fa-qrcode"></i> Scan Voter ID</button>
+  </div>
+
+  <div class="card hidden" id="step2">
+    <p><i class="fas fa-check-circle icon"></i>Voter ID Verified! Proceed to biometric</p>
+    <button onclick="activateBiometric()"><i class="fas fa-fingerprint"></i> Activate Biometric</button>
+  </div>
+
+  <div class="card hidden" id="step3">
+    <p><i class="fas fa-spinner fa-spin icon"></i>Biometric activated. Please wait...</p>
+    <div id="biometricResult"></div>
+  </div>
+
+  <div class="card hidden" id="step4">
+    <p><i class="fas fa-hand-pointer icon"></i>Place your RIGHT HAND INDEX Finger to scan</p>
+    <button onclick="scanFingerprint()"><i class="fas fa-fingerprint"></i> Touch Fingerprint Scanner</button>
+  </div>
+
+  <div class="card hidden" id="step5">
+    <p><i class="fas fa-cogs icon"></i>EVM Machine Activated</p>
+    <div class="finger-buttons">
+      <button onclick="castVote('Party A')"><i class="fas fa-check-double"></i> Party A</button>
+      <button onclick="castVote('Party B')"><i class="fas fa-check-double"></i> Party B</button>
+      <button onclick="castVote('Party C')"><i class="fas fa-check-double"></i> Party C</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="step6">
+    <h2><i class="fas fa-thumbs-up"></i> Vote Successfully Cast!</h2>
+    <p>Thank you for voting.</p>
+  </div>
+
+  <audio id="audioBeep" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
+
+  <script>
+    const speak = (text) => {
+      const utterance = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(utterance);
+    };
+
+    function playBeep() {
+      document.getElementById("audioBeep").play();
+    }
+
+    function updateStepIndicator(step) {
+      document.getElementById("stepIndicator").textContent = `Step ${step} of 6`;
+    }
+
+    function scanVoterID() {
+      playBeep();
+      speak("Scanning Voter ID");
+      updateStepIndicator(2);
+      setTimeout(() => {
+        document.getElementById('step1').classList.add('hidden');
+        document.getElementById('step2').classList.remove('hidden');
+        speak("Voter ID verified. Please activate biometric.");
+      }, 1000);
+    }
+
+    function activateBiometric() {
+      playBeep();
+      speak("Activating Biometric Scanner");
+      updateStepIndicator(3);
+      document.getElementById('step2').classList.add('hidden');
+      document.getElementById('step3').classList.remove('hidden');
+      setTimeout(() => {
+        document.getElementById('biometricResult').innerText = '✅ Success! Now scan your RIGHT HAND INDEX finger';
+        speak("Biometric check passed. Please scan your right hand index finger.");
+        updateStepIndicator(4);
+        document.getElementById('step3').classList.add('hidden');
+        document.getElementById('step4').classList.remove('hidden');
+      }, 3000);
+    }
+
+    function scanFingerprint() {
+      playBeep();
+      speak("Fingerprint scanned successfully");
+      updateStepIndicator(5);
+      document.getElementById('step4').classList.add('hidden');
+      document.getElementById('step5').classList.remove('hidden');
+    }
+
+    function castVote(party) {
+      playBeep();
+      alert('Vote casted for ' + party);
+      speak("Vote casted successfully for " + party);
+      updateStepIndicator(6);
+      document.getElementById('step5').classList.add('hidden');
+      document.getElementById('step6').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
